@@ -18,23 +18,46 @@ fun ContinuousRoundedRectangle.concentricOutset(padding: Dp): ContinuousRoundedR
     return ConcentricContinuousRoundedRectangle(this, -padding)
 }
 
+@Stable
+fun AbsoluteContinuousRoundedRectangle.concentricInset(padding: Dp): AbsoluteContinuousRoundedRectangle {
+    return ConcentricAbsoluteContinuousRoundedRectangle(this, padding)
+}
+
+@Stable
+fun AbsoluteContinuousRoundedRectangle.concentricOutset(padding: Dp): AbsoluteContinuousRoundedRectangle {
+    return ConcentricAbsoluteContinuousRoundedRectangle(this, -padding)
+}
+
 @Immutable
 private data class ConcentricContinuousRoundedRectangle(
     val containerShape: ContinuousRoundedRectangle,
-    val padding: Dp,
+    val padding: Dp
 ) : ContinuousRoundedRectangle(
     topStart = ConcentricCornerSize(containerShape.topStart, padding),
     topEnd = ConcentricCornerSize(containerShape.topEnd, padding),
     bottomEnd = ConcentricCornerSize(containerShape.bottomEnd, padding),
     bottomStart = ConcentricCornerSize(containerShape.bottomStart, padding),
-    continuity = containerShape.continuity,
+    continuity = containerShape.continuity
+)
+
+@Immutable
+private data class ConcentricAbsoluteContinuousRoundedRectangle(
+    val containerShape: AbsoluteContinuousRoundedRectangle,
+    val padding: Dp
+) : AbsoluteContinuousRoundedRectangle(
+    topLeft = ConcentricCornerSize(containerShape.topStart, padding),
+    topRight = ConcentricCornerSize(containerShape.topEnd, padding),
+    bottomRight = ConcentricCornerSize(containerShape.bottomEnd, padding),
+    bottomLeft = ConcentricCornerSize(containerShape.bottomStart, padding),
+    continuity = containerShape.continuity
 )
 
 @Immutable
 private data class ConcentricCornerSize(
     private val containerCornerSize: CornerSize,
-    private val padding: Dp,
+    private val padding: Dp
 ) : CornerSize {
+
     override fun toPx(shapeSize: Size, density: Density): Float {
         return (containerCornerSize.toPx(shapeSize, density) - with(density) { padding.toPx() })
             .fastCoerceAtLeast(0f)

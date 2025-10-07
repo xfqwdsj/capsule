@@ -7,7 +7,8 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.geometry.*
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -22,76 +23,54 @@ open class ContinuousRoundedRectangle(
     topEnd: CornerSize,
     bottomEnd: CornerSize,
     bottomStart: CornerSize,
-    open val continuity: Continuity = Continuity.Default,
+    open val continuity: Continuity = Continuity.Default
 ) : CornerBasedShape(
     topStart = topStart,
     topEnd = topEnd,
     bottomEnd = bottomEnd,
-    bottomStart = bottomStart,
+    bottomStart = bottomStart
 ) {
+
     override fun createOutline(
         size: Size,
         topStart: Float,
         topEnd: Float,
         bottomEnd: Float,
         bottomStart: Float,
-        layoutDirection: LayoutDirection,
+        layoutDirection: LayoutDirection
     ): Outline {
         // rectangle
         if (topStart + topEnd + bottomEnd + bottomStart == 0f) {
             return Outline.Rectangle(size.toRect())
         }
 
-        val (width, height) = size
-        val centerX = width * 0.5f
-        val centerY = height * 0.5f
+        val maxRadius = min(size.width, size.height) * 0.5f
+        val topLeft = (if (layoutDirection == Ltr) topStart else topEnd).fastCoerceIn(0f, maxRadius)
+        val topRight = (if (layoutDirection == Ltr) topEnd else topStart).fastCoerceIn(0f, maxRadius)
+        val bottomRight = (if (layoutDirection == Ltr) bottomEnd else bottomStart).fastCoerceIn(0f, maxRadius)
+        val bottomLeft = (if (layoutDirection == Ltr) bottomStart else bottomEnd).fastCoerceIn(0f, maxRadius)
 
-        val maxR = min(centerX, centerY)
-        val topLeft = (if (layoutDirection == Ltr) topStart else topEnd).fastCoerceIn(0f, maxR)
-        val topRight = (if (layoutDirection == Ltr) topEnd else topStart).fastCoerceIn(0f, maxR)
-        val bottomRight = (if (layoutDirection == Ltr) bottomEnd else bottomStart).fastCoerceIn(0f, maxR)
-        val bottomLeft = (if (layoutDirection == Ltr) bottomStart else bottomEnd).fastCoerceIn(0f, maxR)
-
-        // normal rounded rectangle or circle
-        if (
-            !continuity.hasSmoothness ||
-            (width == height && topLeft == centerX && topLeft == topRight && bottomLeft == bottomRight)
-        ) {
-            return Outline.Rounded(
-                RoundRect(
-                    rect = size.toRect(),
-                    topLeft = CornerRadius(topLeft),
-                    topRight = CornerRadius(topRight),
-                    bottomRight = CornerRadius(bottomRight),
-                    bottomLeft = CornerRadius(bottomLeft),
-                ),
-            )
-        }
-
-        // continuous rounded rectangle
-        val path = continuity.createRoundedRectanglePathSegments(
-            width = size.width.toDouble(),
-            height = size.height.toDouble(),
-            topLeft = topLeft.toDouble(),
-            topRight = topRight.toDouble(),
-            bottomRight = bottomRight.toDouble(),
-            bottomLeft = bottomLeft.toDouble(),
-        ).toPath()
-        return Outline.Generic(path)
+        return continuity.createRoundedRectangleOutline(
+            size = size,
+            topLeft = topLeft,
+            topRight = topRight,
+            bottomRight = bottomRight,
+            bottomLeft = bottomLeft
+        )
     }
 
     override fun copy(
         topStart: CornerSize,
         topEnd: CornerSize,
         bottomEnd: CornerSize,
-        bottomStart: CornerSize,
+        bottomStart: CornerSize
     ): ContinuousRoundedRectangle {
         return ContinuousRoundedRectangle(
             topStart = topStart,
             topEnd = topEnd,
             bottomEnd = bottomEnd,
             bottomStart = bottomStart,
-            continuity = continuity,
+            continuity = continuity
         )
     }
 
@@ -100,14 +79,14 @@ open class ContinuousRoundedRectangle(
         topEnd: CornerSize = this.topEnd,
         bottomEnd: CornerSize = this.bottomEnd,
         bottomStart: CornerSize = this.bottomStart,
-        continuity: Continuity = this.continuity,
+        continuity: Continuity = this.continuity
     ): ContinuousRoundedRectangle {
         return ContinuousRoundedRectangle(
             topStart = topStart,
             topEnd = topEnd,
             bottomEnd = bottomEnd,
             bottomStart = bottomStart,
-            continuity = continuity,
+            continuity = continuity
         )
     }
 
@@ -135,21 +114,31 @@ open class ContinuousRoundedRectangle(
 
     override fun toString(): String {
         return "ContinuousRoundedRectangle(topStart=$topStart, topEnd=$topEnd, bottomEnd=$bottomEnd, " +
-                "bottomStart=$bottomStart, cornerSmoothing=$continuity)"
+                "bottomStart=$bottomStart, continuity=$continuity)"
     }
 }
 
+@Stable
+val ContinuousRectangle: ContinuousRoundedRectangle = ContinuousRectangleImpl()
+
+@Suppress("FunctionName")
+@Stable
+fun ContinuousRectangle(continuity: Continuity = Continuity.Default): ContinuousRoundedRectangle =
+    ContinuousRectangleImpl(continuity)
+
 @Immutable
-data object ContinuousRectangle : ContinuousRoundedRectangle(
+private data class ContinuousRectangleImpl(
+    override val continuity: Continuity = Continuity.Default
+) : ContinuousRoundedRectangle(
     topStart = ZeroCornerSize,
     topEnd = ZeroCornerSize,
     bottomEnd = ZeroCornerSize,
     bottomStart = ZeroCornerSize,
-    continuity = G1Continuity,
+    continuity = continuity
 ) {
 
     override fun toString(): String {
-        return "ContinuousRectangle"
+        return "ContinuousRectangle(continuity=$continuity)"
     }
 }
 
@@ -160,19 +149,18 @@ val ContinuousCapsule: ContinuousRoundedRectangle = ContinuousCapsule()
 
 @Suppress("FunctionName")
 @Stable
-fun ContinuousCapsule(
-    continuity: Continuity = Continuity.Default,
-): ContinuousRoundedRectangle = ContinuousCapsuleImpl(continuity)
+fun ContinuousCapsule(continuity: Continuity = Continuity.Default): ContinuousRoundedRectangle =
+    ContinuousCapsuleImpl(continuity)
 
 @Immutable
 private data class ContinuousCapsuleImpl(
-    override val continuity: Continuity = Continuity.Default,
+    override val continuity: Continuity = Continuity.Default
 ) : ContinuousRoundedRectangle(
     topStart = FullCornerSize,
     topEnd = FullCornerSize,
     bottomEnd = FullCornerSize,
     bottomStart = FullCornerSize,
-    continuity = continuity,
+    continuity = continuity
 ) {
 
     override fun createOutline(
@@ -181,97 +169,71 @@ private data class ContinuousCapsuleImpl(
         topEnd: Float,
         bottomEnd: Float,
         bottomStart: Float,
-        layoutDirection: LayoutDirection,
-    ): Outline {
-        val (width, height) = size
-        val (centerX, centerY) = size.center
-        val radius = min(centerX, centerY)
-
-        // normal capsule or circle
-        if (
-            !continuity.hasSmoothness ||
-            (width == height && topStart == centerX && topStart == topEnd && bottomStart == bottomEnd)
-        ) {
-            return Outline.Rounded(
-                RoundRect(
-                    rect = size.toRect(),
-                    radiusX = radius,
-                    radiusY = radius,
-                ),
-            )
-        }
-
-        // continuous capsule
-        val isHorizontalCapsule = width > height
-        return if (isHorizontalCapsule) {
-            continuity.createHorizontalCapsuleOutline(size)
-        } else {
-            continuity.createVerticalCapsuleOutline(size)
-        }
-    }
+        layoutDirection: LayoutDirection
+    ): Outline = continuity.createCapsuleOutline(size)
 
     override fun toString(): String {
-        return "ContinuousCapsule(cornerSmoothing=$continuity)"
+        return "ContinuousCapsule(continuity=$continuity)"
     }
 }
 
 @Stable
 fun ContinuousRoundedRectangle(
     corner: CornerSize,
-    continuity: Continuity = Continuity.Default,
+    continuity: Continuity = Continuity.Default
 ): ContinuousRoundedRectangle =
     ContinuousRoundedRectangle(
         topStart = corner,
         topEnd = corner,
         bottomEnd = corner,
         bottomStart = corner,
-        continuity = continuity,
+        continuity = continuity
     )
 
 @Stable
 fun ContinuousRoundedRectangle(
     size: Dp,
-    continuity: Continuity = Continuity.Default,
+    continuity: Continuity = Continuity.Default
 ): ContinuousRoundedRectangle =
     ContinuousRoundedRectangle(
         corner = CornerSize(size),
-        continuity = continuity,
+        continuity = continuity
     )
 
 @Stable
 fun ContinuousRoundedRectangle(
     @FloatRange(from = 0.0) size: Float,
-    continuity: Continuity = Continuity.Default,
+    continuity: Continuity = Continuity.Default
 ): ContinuousRoundedRectangle =
     ContinuousRoundedRectangle(
         corner = CornerSize(size),
-        continuity = continuity,
+        continuity = continuity
     )
 
 @Stable
 fun ContinuousRoundedRectangle(
     @IntRange(from = 0, to = 100) percent: Int,
-    continuity: Continuity = Continuity.Default,
+    continuity: Continuity = Continuity.Default
 ): ContinuousRoundedRectangle =
     ContinuousRoundedRectangle(
         corner = CornerSize(percent),
-        continuity = continuity,
+        continuity = continuity
     )
 
 @Stable
 fun ContinuousRoundedRectangle(
-    topStart: Dp = 0.dp,
-    topEnd: Dp = 0.dp,
-    bottomEnd: Dp = 0.dp,
-    bottomStart: Dp = 0.dp,
-    continuity: Continuity = Continuity.Default,
+    topStart: Dp = 0f.dp,
+    topEnd: Dp = 0f.dp,
+    bottomEnd: Dp = 0f.dp,
+    bottomStart: Dp = 0f.dp,
+    continuity: Continuity = Continuity.Default
 ): ContinuousRoundedRectangle =
     ContinuousRoundedRectangle(
         topStart = CornerSize(topStart),
         topEnd = CornerSize(topEnd),
         bottomEnd = CornerSize(bottomEnd),
         bottomStart = CornerSize(bottomStart),
-        continuity = continuity,
+        continuity = continuity
     )
 
 @Stable
@@ -280,14 +242,14 @@ fun ContinuousRoundedRectangle(
     @FloatRange(from = 0.0) topEnd: Float = 0f,
     @FloatRange(from = 0.0) bottomEnd: Float = 0f,
     @FloatRange(from = 0.0) bottomStart: Float = 0f,
-    continuity: Continuity = Continuity.Default,
+    continuity: Continuity = Continuity.Default
 ): ContinuousRoundedRectangle =
     ContinuousRoundedRectangle(
         topStart = CornerSize(topStart),
         topEnd = CornerSize(topEnd),
         bottomEnd = CornerSize(bottomEnd),
         bottomStart = CornerSize(bottomStart),
-        continuity = continuity,
+        continuity = continuity
     )
 
 @Stable
@@ -296,12 +258,12 @@ fun ContinuousRoundedRectangle(
     @IntRange(from = 0, to = 100) topEndPercent: Int = 0,
     @IntRange(from = 0, to = 100) bottomEndPercent: Int = 0,
     @IntRange(from = 0, to = 100) bottomStartPercent: Int = 0,
-    continuity: Continuity = Continuity.Default,
+    continuity: Continuity = Continuity.Default
 ): ContinuousRoundedRectangle =
     ContinuousRoundedRectangle(
         topStart = CornerSize(topStartPercent),
         topEnd = CornerSize(topEndPercent),
         bottomEnd = CornerSize(bottomEndPercent),
         bottomStart = CornerSize(bottomStartPercent),
-        continuity = continuity,
+        continuity = continuity
     )
