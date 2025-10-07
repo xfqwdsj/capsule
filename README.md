@@ -51,16 +51,32 @@ Custom continuity:
 ```kotlin
 val g1 = G1Continuity // no corner smoothness
 val g2 = G2Continuity(
-    circleFraction = 0.18,
-    extendedFraction = 0.5,
-    bezierCurvatureScale = 1.15,
-    circleCurvatureScale = 1.15,
+    profile = G2ContinuityProfile.RoundedRectangle.copy(
+        extendedFraction = 0.5,
+        arcFraction = 0.5,
+        bezierCurvatureScale = 1.1,
+        arcCurvatureScale = 1.1
+    ),
+    capsuleProfile = G2ContinuityProfile.Capsule.copy(
+        extendedFraction = 0.5,
+        arcFraction = 0.25
+    )
 )
 
 // create shapes with custom continuity
 ContinuousRoundedRectangle(16.dp, continuity = g2)
 ContinuousCapsule(continuity = g2)
 ```
+
+The following parameters are supported by `G2ContinuityProfile`:
+
+- **Extended fraction:** the transition length between original corner and line, relative to the corner radius
+- **Arc fraction:** the ratio of the arc to the corner
+- **Bezier curvature scale**: the multiplier of the end curvature of the Bézier curve
+- **Arc curvature scale**: the multiplier of the arc curvature
+
+**Note:** It guarantees G1 continuity at least. Only if the Bezier curvature scale equals the arc curvature scale,
+it will have exact G2 continuity.
 
 ## Performance
 
