@@ -1,9 +1,9 @@
 [versions]
-kotlin = "2.2.20"
-agp = "8.12.0"
-compose = "1.9.0"
-dokka = "2.0.0"
-mavenPublish = "0.34.0"
+kotlin = "2.2.21"
+agp = "8.12.3"
+compose = "1.9.3"
+dokka = "2.1.0"
+mavenPublish = "0.35.0"
 
 [libraries]
 
