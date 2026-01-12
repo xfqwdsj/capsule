@@ -180,7 +180,7 @@ data class G2Continuity(
                     center = Point(width - topRight, topRight),
                     radius = topRight,
                     radiusScale = 1.0 / arcKScaleTR,
-                    startAngle = -PI * 0.5 + PI * 0.5 * (1.0 - arcFracBL) * 0.5,
+                    startAngle = -PI * 0.5 + PI * 0.5 * (1.0 - arcFracTR) * 0.5,
                     sweepAngle = PI * 0.5 * arcFracTR
                 )
 
