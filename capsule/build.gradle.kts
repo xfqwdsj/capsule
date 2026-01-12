@@ -19,10 +19,19 @@ kotlin {
             jvmTarget = JvmTarget.JVM_11
         }
     }
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = "top.ltfan.capsule"
+        compileSdk = 36
+        minSdk = 21
+
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11
+        }
+
+        packaging {
+            resources {
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            }
         }
     }
     macosX64()
@@ -54,28 +63,6 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xcontext-parameters")
         freeCompilerArgs.add("-Xcontext-sensitive-resolution")
-    }
-}
-
-android {
-    namespace = "top.ltfan.capsule"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 21
-    }
-
-    sourceSets {}
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
     }
 }
 
