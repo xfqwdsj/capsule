@@ -5,6 +5,7 @@ import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.fastCoerceIn
 import com.kyant.capsule.AdvancedContinuity
 import com.kyant.capsule.Continuity
+import com.kyant.capsule.core.CubicBezier
 import com.kyant.capsule.core.Point
 import com.kyant.capsule.lerp
 import com.kyant.capsule.path.PathSegments
@@ -28,6 +29,37 @@ public data class G2Continuity(
             else -> profile.bezier
         }
 
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun resolveRatio(centerExtent: Double, cornerRadius: Double, extendedFraction: Double): Double =
+        ((centerExtent / cornerRadius - 1.0) / extendedFraction).fastCoerceIn(0.0, 1.0)
+
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun resolveBezierCurvatureScale(ratio: Double): Double =
+        lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratio)
+
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun resolveCapsuleGeometry(centerExtent: Double, radius: Double): CapsuleGeometry {
+        val ratio = resolveRatio(centerExtent, radius, capsuleProfile.extendedFraction)
+        val extFrac = capsuleProfile.extendedFraction * ratio
+        val arcFrac = capsuleProfile.arcFraction
+        val bezier = resolveBezier(
+            G2ContinuityProfile(
+                extendedFraction = extFrac,
+                arcFraction = arcFrac,
+                bezierCurvatureScale = resolveBezierCurvatureScale(ratio),
+                arcCurvatureScale = 1.0
+            )
+        ) * radius
+        val arcRad = PI * 0.5 * arcFrac
+        val bezRad = (PI * 0.5 - arcRad) * 0.5
+        return CapsuleGeometry(
+            bezier = bezier,
+            offset = -radius * extFrac,
+            bezRad = bezRad,
+            sweepRad = (bezRad + arcRad) * 2.0
+        )
+    }
+
     override fun createStandardRoundedRectanglePathSegments(
         width: Double,
         height: Double,
@@ -45,14 +77,14 @@ public data class G2Continuity(
 
         // non-capsule ratios of each half corner
         // 0: full capsule, 1: safe rounded rectangle, (0, 1): progressive capsule
-        val ratioTLV = ((centerY / topLeft - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val ratioTLH = ((centerX / topLeft - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val ratioTRH = ((centerX / topRight - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val ratioTRV = ((centerY / topRight - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val ratioBRV = ((centerY / bottomRight - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val ratioBRH = ((centerX / bottomRight - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val ratioBLH = ((centerX / bottomLeft - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val ratioBLV = ((centerY / bottomLeft - 1.0) / profile.extendedFraction).fastCoerceIn(0.0, 1.0)
+        val ratioTLV = resolveRatio(centerY, topLeft, profile.extendedFraction)
+        val ratioTLH = resolveRatio(centerX, topLeft, profile.extendedFraction)
+        val ratioTRH = resolveRatio(centerX, topRight, profile.extendedFraction)
+        val ratioTRV = resolveRatio(centerY, topRight, profile.extendedFraction)
+        val ratioBRV = resolveRatio(centerY, bottomRight, profile.extendedFraction)
+        val ratioBRH = resolveRatio(centerX, bottomRight, profile.extendedFraction)
+        val ratioBLH = resolveRatio(centerX, bottomLeft, profile.extendedFraction)
+        val ratioBLV = resolveRatio(centerY, bottomLeft, profile.extendedFraction)
 
         // constrained non-capsule ratios of each corner
         val ratioTL = min(ratioTLV, ratioTLH)
@@ -89,14 +121,14 @@ public data class G2Continuity(
         val offsetBLV = -bottomLeft * extFracBLV
 
         // Bezier curvature scales of each half corner
-        val bezKScaleTLV = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioTLV)
-        val bezKScaleTLH = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioTLH)
-        val bezKScaleTRH = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioTRH)
-        val bezKScaleTRV = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioTRV)
-        val bezKScaleBRV = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioBRV)
-        val bezKScaleBRH = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioBRH)
-        val bezKScaleBLH = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioBLH)
-        val bezKScaleBLV = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioBLV)
+        val bezKScaleTLV = resolveBezierCurvatureScale(ratioTLV)
+        val bezKScaleTLH = resolveBezierCurvatureScale(ratioTLH)
+        val bezKScaleTRH = resolveBezierCurvatureScale(ratioTRH)
+        val bezKScaleTRV = resolveBezierCurvatureScale(ratioTRV)
+        val bezKScaleBRV = resolveBezierCurvatureScale(ratioBRV)
+        val bezKScaleBRH = resolveBezierCurvatureScale(ratioBRH)
+        val bezKScaleBLH = resolveBezierCurvatureScale(ratioBLH)
+        val bezKScaleBLV = resolveBezierCurvatureScale(ratioBLV)
 
         // arc stuffs
 
@@ -277,27 +309,8 @@ public data class G2Continuity(
 
     override fun createHorizontalCapsulePathSegments(width: Double, height: Double): PathSegments {
         val radius = height * 0.5
-        val centerX = width * 0.5
 
-        val ratioH = ((centerX / radius - 1.0) / capsuleProfile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val extFrac = capsuleProfile.extendedFraction
-        val extFracH = extFrac * ratioH
-        val offsetH = -radius * extFracH
-        val bezKScaleH = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioH)
-        val arcFrac = capsuleProfile.arcFraction
-        val bezierH =
-            resolveBezier(
-                G2ContinuityProfile(
-                    extendedFraction = extFracH,
-                    arcFraction = arcFrac,
-                    bezierCurvatureScale = bezKScaleH,
-                    arcCurvatureScale = 1.0
-                )
-            ) * radius
-
-        val arcRad = PI * 0.5 * arcFrac
-        val bezRad = (PI * 0.5 - arcRad) * 0.5
-        val sweepRad = (bezRad + arcRad) * 2.0
+        val (bezierH, offsetH, bezRad, sweepRad) = resolveCapsuleGeometry(width * 0.5, radius)
 
         return buildPathSegments {
             var x = 0.0
@@ -374,27 +387,8 @@ public data class G2Continuity(
 
     override fun createVerticalCapsulePathSegments(width: Double, height: Double): PathSegments {
         val radius = width * 0.5
-        val centerY = height * 0.5
 
-        val ratioV = ((centerY / radius - 1.0) / capsuleProfile.extendedFraction).fastCoerceIn(0.0, 1.0)
-        val extFrac = capsuleProfile.extendedFraction
-        val extFracV = extFrac * ratioV
-        val offsetV = -radius * extFracV
-        val bezKScaleV = lerp(capsuleProfile.bezierCurvatureScale, profile.bezierCurvatureScale, ratioV)
-        val arcFrac = capsuleProfile.arcFraction
-        val bezierV =
-            resolveBezier(
-                G2ContinuityProfile(
-                    extendedFraction = extFracV,
-                    arcFraction = arcFrac,
-                    bezierCurvatureScale = bezKScaleV,
-                    arcCurvatureScale = 1.0
-                )
-            ) * radius
-
-        val arcRad = PI * 0.5 * arcFrac
-        val bezRad = (PI * 0.5 - arcRad) * 0.5
-        val sweepRad = (bezRad + arcRad) * 2.0
+        val (bezierV, offsetV, bezRad, sweepRad) = resolveCapsuleGeometry(height * 0.5, radius)
 
         return buildPathSegments {
             var x = 0.0
@@ -479,6 +473,13 @@ public data class G2Continuity(
         }
     }
 }
+
+private data class CapsuleGeometry(
+    val bezier: CubicBezier,
+    val offset: Double,
+    val bezRad: Double,
+    val sweepRad: Double
+)
 
 private fun PathSegmentsBuilder.arcToWithScaledRadius(
     center: Point,
