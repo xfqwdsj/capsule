@@ -13,7 +13,7 @@ import com.kyant.capsule.path.buildPathSegments
 import kotlin.math.PI
 
 @Immutable
-data object G1Continuity : Continuity {
+public data object G1Continuity : Continuity {
 
     override fun createRoundedRectanglePathSegments(
         width: Double,

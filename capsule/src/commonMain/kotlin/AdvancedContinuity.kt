@@ -11,7 +11,7 @@ import com.kyant.capsule.path.buildCirclePathSegments
 import com.kyant.capsule.path.toPath
 
 @Immutable
-abstract class AdvancedContinuity : Continuity {
+public abstract class AdvancedContinuity : Continuity {
 
     protected abstract fun createStandardRoundedRectanglePathSegments(
         width: Double,
@@ -150,7 +150,7 @@ abstract class AdvancedContinuity : Continuity {
         )
     }
 
-    fun createCapsulePathSegments(width: Double, height: Double): PathSegments =
+    public fun createCapsulePathSegments(width: Double, height: Double): PathSegments =
         when {
             width > height -> createHorizontalCapsulePathSegments(width, height)
             width < height -> createVerticalCapsulePathSegments(width, height)

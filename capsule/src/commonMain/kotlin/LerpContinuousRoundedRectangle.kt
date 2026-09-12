@@ -9,7 +9,7 @@ import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.lerp
 
 @Stable
-fun lerp(
+public fun lerp(
     start: ContinuousRoundedRectangle,
     stop: ContinuousRoundedRectangle,
     fraction: Float
@@ -18,7 +18,7 @@ fun lerp(
 }
 
 @Stable
-fun lerp(
+public fun lerp(
     start: AbsoluteContinuousRoundedRectangle,
     stop: AbsoluteContinuousRoundedRectangle,
     fraction: Float

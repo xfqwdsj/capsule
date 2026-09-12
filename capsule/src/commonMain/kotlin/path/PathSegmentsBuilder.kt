@@ -2,15 +2,15 @@ package com.kyant.capsule.path
 
 import com.kyant.capsule.core.Point
 
-inline fun buildPathSegments(block: PathSegmentsBuilder.() -> Unit): PathSegments {
+public inline fun buildPathSegments(block: PathSegmentsBuilder.() -> Unit): PathSegments {
     return PathSegmentsBuilder().apply(block).build()
 }
 
-fun buildCirclePathSegments(center: Point, radius: Double): PathSegments {
+public fun buildCirclePathSegments(center: Point, radius: Double): PathSegments {
     return listOf(PathSegment.Circle(center, radius))
 }
 
-class PathSegmentsBuilder {
+public class PathSegmentsBuilder {
 
     private var startPoint = Point.Zero
     private var currentPoint = Point.Zero
@@ -18,7 +18,7 @@ class PathSegmentsBuilder {
 
     private var segments = mutableListOf<PathSegment>()
 
-    fun moveTo(x: Double, y: Double) {
+    public fun moveTo(x: Double, y: Double) {
         if (didMove) {
             throw IllegalStateException("moveTo can only be called once at the beginning of the path")
         }
@@ -27,19 +27,19 @@ class PathSegmentsBuilder {
         currentPoint = startPoint
     }
 
-    fun lineTo(x: Double, y: Double) {
+    public fun lineTo(x: Double, y: Double) {
         val segment = PathSegment.Line(currentPoint, Point(x, y))
         segments += segment
         currentPoint = segment.to
     }
 
-    fun arcTo(center: Point, radius: Double, startAngle: Double, sweepAngle: Double) {
+    public fun arcTo(center: Point, radius: Double, startAngle: Double, sweepAngle: Double) {
         val segment = PathSegment.Arc(center, radius, startAngle, sweepAngle)
         segments += segment
         currentPoint = segment.to
     }
 
-    fun cubicTo(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double) {
+    public fun cubicTo(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double) {
         val segment = PathSegment.Cubic(
             currentPoint,
             Point(x1, y1),
@@ -50,13 +50,13 @@ class PathSegmentsBuilder {
         currentPoint = segment.to
     }
 
-    fun close() {
+    public fun close() {
         val segment = PathSegment.Line(currentPoint, startPoint)
         segments += segment
         currentPoint = segment.to
     }
 
-    fun build(): PathSegments {
+    public fun build(): PathSegments {
         return segments.toList()
     }
 }

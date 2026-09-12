@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Path
 import kotlin.math.PI
 import kotlin.math.abs
 
-typealias PathSegments = List<PathSegment>
+public typealias PathSegments = List<PathSegment>
 
-fun PathSegments.toPath(): Path {
+public fun PathSegments.toPath(): Path {
     return Path().apply {
         if (isEmpty()) return@apply
         val startPoint = first().from
@@ -15,7 +15,7 @@ fun PathSegments.toPath(): Path {
     }
 }
 
-fun PathSegments.toSvg(asDocument: Boolean = false): String = buildString {
+public fun PathSegments.toSvg(asDocument: Boolean = false): String = buildString {
     val bounds = this@toSvg.toPath().getBounds()
 
     if (asDocument) {

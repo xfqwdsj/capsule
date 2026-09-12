@@ -6,7 +6,7 @@ import com.kyant.capsule.path.PathSegments
 import com.kyant.capsule.path.buildPathSegments
 
 @Immutable
-data object G0Continuity : Continuity {
+public data object G0Continuity : Continuity {
 
     override fun createRoundedRectanglePathSegments(
         width: Double,

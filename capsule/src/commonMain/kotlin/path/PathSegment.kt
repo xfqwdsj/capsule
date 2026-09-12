@@ -9,14 +9,14 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 @Immutable
-sealed interface PathSegment {
+public sealed interface PathSegment {
 
-    val from: Point
-    val to: Point
+    public val from: Point
+    public val to: Point
 
-    fun drawTo(path: Path)
+    public fun drawTo(path: Path)
 
-    data class Line(
+    public data class Line(
         override val from: Point,
         override val to: Point,
     ) : PathSegment {
@@ -26,7 +26,7 @@ sealed interface PathSegment {
         }
     }
 
-    data class Arc(
+    public data class Arc(
         val center: Point,
         val radius: Double,
         val startAngle: Double,
@@ -60,7 +60,7 @@ sealed interface PathSegment {
         }
     }
 
-    data class Circle(
+    public data class Circle(
         val center: Point,
         val radius: Double,
     ) : PathSegment {
@@ -83,7 +83,7 @@ sealed interface PathSegment {
         }
     }
 
-    data class Cubic(
+    public data class Cubic(
         val p0: Point,
         val p1: Point,
         val p2: Point,

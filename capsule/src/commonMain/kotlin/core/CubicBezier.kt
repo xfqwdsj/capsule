@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 
 @Immutable
-data class CubicBezier(
+public data class CubicBezier(
     val p0: Point,
     val p1: Point,
     val p2: Point,
@@ -12,7 +12,7 @@ data class CubicBezier(
 ) {
 
     @Stable
-    operator fun times(operand: Double): CubicBezier {
+    public operator fun times(operand: Double): CubicBezier {
         return CubicBezier(
             p0 * operand,
             p1 * operand,

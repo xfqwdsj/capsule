@@ -14,6 +14,8 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
+
     jvm {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11

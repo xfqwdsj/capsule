@@ -9,22 +9,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastCoerceAtLeast
 
 @Stable
-fun ContinuousRoundedRectangle.concentricInset(padding: Dp): ContinuousRoundedRectangle {
+public fun ContinuousRoundedRectangle.concentricInset(padding: Dp): ContinuousRoundedRectangle {
     return ConcentricContinuousRoundedRectangle(this, padding)
 }
 
 @Stable
-fun ContinuousRoundedRectangle.concentricOutset(padding: Dp): ContinuousRoundedRectangle {
+public fun ContinuousRoundedRectangle.concentricOutset(padding: Dp): ContinuousRoundedRectangle {
     return ConcentricContinuousRoundedRectangle(this, -padding)
 }
 
 @Stable
-fun AbsoluteContinuousRoundedRectangle.concentricInset(padding: Dp): AbsoluteContinuousRoundedRectangle {
+public fun AbsoluteContinuousRoundedRectangle.concentricInset(padding: Dp): AbsoluteContinuousRoundedRectangle {
     return ConcentricAbsoluteContinuousRoundedRectangle(this, padding)
 }
 
 @Stable
-fun AbsoluteContinuousRoundedRectangle.concentricOutset(padding: Dp): AbsoluteContinuousRoundedRectangle {
+public fun AbsoluteContinuousRoundedRectangle.concentricOutset(padding: Dp): AbsoluteContinuousRoundedRectangle {
     return ConcentricAbsoluteContinuousRoundedRectangle(this, -padding)
 }
 

@@ -9,9 +9,9 @@ import com.kyant.capsule.path.PathSegments
 import com.kyant.capsule.path.toPath
 
 @Immutable
-interface Continuity {
+public interface Continuity {
 
-    fun createRoundedRectanglePathSegments(
+    public fun createRoundedRectanglePathSegments(
         width: Double,
         height: Double,
         topLeft: Double,
@@ -20,7 +20,7 @@ interface Continuity {
         bottomLeft: Double
     ): PathSegments
 
-    fun createRoundedRectangleOutline(
+    public fun createRoundedRectangleOutline(
         size: Size,
         topLeft: Float,
         topRight: Float,
@@ -39,7 +39,7 @@ interface Continuity {
         return Outline.Generic(path)
     }
 
-    fun createCapsuleOutline(size: Size): Outline {
+    public fun createCapsuleOutline(size: Size): Outline {
         val radius = size.minDimension * 0.5f
         return createRoundedRectangleOutline(
             size = size,
@@ -50,11 +50,11 @@ interface Continuity {
         )
     }
 
-    fun lerp(stop: Continuity, fraction: Double): Continuity
+    public fun lerp(stop: Continuity, fraction: Double): Continuity
 
-    companion object {
+    public companion object {
 
         @Stable
-        val Default: Continuity = G2Continuity()
+        public val Default: Continuity = G2Continuity()
     }
 }
