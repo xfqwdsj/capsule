@@ -34,10 +34,8 @@ kotlin {
             }
         }
     }
-    macosX64()
     macosArm64()
     iosSimulatorArm64()
-    iosX64()
     iosArm64()
     js { browser() }
     @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
@@ -45,7 +43,7 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
@@ -53,7 +51,7 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -61,7 +59,6 @@ kotlin {
     }
 
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
         freeCompilerArgs.add("-Xcontext-sensitive-resolution")
     }
 }
