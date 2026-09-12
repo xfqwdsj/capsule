@@ -23,7 +23,11 @@ kotlin {
     }
     android {
         namespace = "top.ltfan.capsule"
-        compileSdk = 36
+        compileSdk {
+            version = release(37) {
+                minorApiLevel = 2
+            }
+        }
         minSdk = 21
 
         compilerOptions {
