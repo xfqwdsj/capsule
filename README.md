@@ -78,6 +78,29 @@ The following parameters are supported by `G2ContinuityProfile`:
 **Note:** It guarantees G1 continuity at least. Only if the Bezier curvature scale equals the arc curvature scale,
 it will have exact G2 continuity.
 
+## Animation
+
+All shapes implement the `Interpolatable` interface, so they are interpolated automatically by the Compose
+[Styles API](https://developer.android.com/develop/ui/compose/styles) when a `Style` animates between shapes (requires
+opting in to `ExperimentalFoundationStyleApi`):
+
+```kotlin
+val style = Style {
+    shape(ContinuousRoundedRectangle(16.dp))
+    pressed {
+        animate {
+            shape(ContinuousCapsule)
+        }
+    }
+}
+```
+
+Shapes can also be interpolated manually with `lerp`:
+
+```kotlin
+val shape = lerp(ContinuousRoundedRectangle(16.dp), ContinuousCapsule, fraction)
+```
+
 ## Performance
 
 Drawing cubic Bézier curves on Android performs poorly. However, the Capsule library uses a very efficient method to
