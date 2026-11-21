@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.kyant.capsule
 
 import androidx.annotation.FloatRange
@@ -18,8 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastCoerceIn
 import kotlin.math.min
 
+internal const val StandaloneCapsuleDeprecation =
+    "Standalone Capsule is deprecated. Migrate to top.ltfan.m3x:capsule. " +
+        "See https://github.com/xfqwdsj/capsule#migrate-to-m3x"
+
 @Immutable
-public open class ContinuousRoundedRectangle(
+public open class ContinuousRoundedRectangle
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
+public constructor(
     topStart: CornerSize,
     topEnd: CornerSize,
     bottomEnd: CornerSize,
@@ -131,10 +139,12 @@ public open class ContinuousRoundedRectangle(
 }
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public val ContinuousRectangle: ContinuousRoundedRectangle = ContinuousRectangleImpl()
 
 @Suppress("FunctionName")
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRectangle(continuity: Continuity = Continuity.Default): ContinuousRoundedRectangle =
     ContinuousRectangleImpl(continuity)
 
@@ -157,10 +167,12 @@ private data class ContinuousRectangleImpl(
 private val FullCornerSize = CornerSize(50)
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public val ContinuousCapsule: ContinuousRoundedRectangle = ContinuousCapsule()
 
 @Suppress("FunctionName")
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousCapsule(continuity: Continuity = Continuity.Default): ContinuousRoundedRectangle =
     ContinuousCapsuleImpl(continuity)
 
@@ -190,6 +202,7 @@ private data class ContinuousCapsuleImpl(
 }
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRoundedRectangle(
     corner: CornerSize,
     continuity: Continuity = Continuity.Default
@@ -203,6 +216,7 @@ public fun ContinuousRoundedRectangle(
     )
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRoundedRectangle(
     size: Dp,
     continuity: Continuity = Continuity.Default
@@ -213,6 +227,7 @@ public fun ContinuousRoundedRectangle(
     )
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRoundedRectangle(
     @FloatRange(from = 0.0) size: Float,
     continuity: Continuity = Continuity.Default
@@ -223,6 +238,7 @@ public fun ContinuousRoundedRectangle(
     )
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRoundedRectangle(
     @IntRange(from = 0, to = 100) percent: Int,
     continuity: Continuity = Continuity.Default
@@ -233,6 +249,7 @@ public fun ContinuousRoundedRectangle(
     )
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRoundedRectangle(
     topStart: Dp = 0f.dp,
     topEnd: Dp = 0f.dp,
@@ -249,6 +266,7 @@ public fun ContinuousRoundedRectangle(
     )
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRoundedRectangle(
     @FloatRange(from = 0.0) topStart: Float = 0f,
     @FloatRange(from = 0.0) topEnd: Float = 0f,
@@ -265,6 +283,7 @@ public fun ContinuousRoundedRectangle(
     )
 
 @Stable
+@Deprecated(StandaloneCapsuleDeprecation, level = DeprecationLevel.WARNING)
 public fun ContinuousRoundedRectangle(
     @IntRange(from = 0, to = 100) topStartPercent: Int = 0,
     @IntRange(from = 0, to = 100) topEndPercent: Int = 0,
